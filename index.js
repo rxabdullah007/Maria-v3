@@ -114,9 +114,9 @@ logger(`Hiện tại tổng có ${totalDependencies} Package`, '[ PACKAGE ]');
 ////////// CHECK LỖI MODULES //////////
 ///////////////////////////////////////
 try {
-  var files = fs.readdirSync('./Script/commands');
+  var files = fs.readdirSync('./modules/commands');
   files.forEach(file => {
-    if (file.endsWith('.js')) {     require(`./Script/commands/${file}`);
+    if (file.endsWith('.js')) {     require(`./modules/commands/${file}`);
     }
 }); 
 logger('Tiến Hành Check Lỗi', '[ AUTO-CHECK ]');
@@ -127,7 +127,7 @@ console.log(error);
    }
 });
 function startBot(message) {
-    (message) ? logger(message, "[ rX Abdullah ]") : "";
+    (message) ? logger(message, "[ Bắt đầu ]") : "";
 
     const child = spawn("node", ["--trace-warnings", "--async-stack-traces", "main.js"], {
         cwd: __dirname,
