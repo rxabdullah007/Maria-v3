@@ -3,70 +3,146 @@ const path = require("path");
 
 module.exports.config = {
   name: "approve",
-  version: "1.1",
-  hasPermssion: 1,
-  credits: "Rx Abdullah",
-  description: "Add group to thuebot.json with flexible period",
+  version: "1.8",
+  hasPermssion: 2,
+  credits: "rX",
+  description: "Approve group, show list & reply number to remove",
   commandCategory: "Admin",
-  usages: "!group add <tid> <number+unit> (e.g., 2year, 10day, 6month)",
+  usages: "!approve <tid> <2day/2month/2year> | !approve box",
   cooldowns: 5,
 };
 
+const DATA_PATH = path.join(__dirname, "data", "thuebot.json");
+
+// ===== DATE FORMAT =====
+const formatDate = (d) =>
+  `${String(d.getDate()).padStart(2, "0")}/${String(
+    d.getMonth() + 1
+  ).padStart(2, "0")}/${d.getFullYear()}`;
+
+const parseDate = (str) => {
+  const [dd, mm, yy] = str.split("/").map(Number);
+  return new Date(yy, mm - 1, dd);
+};
+
+// ===== MAIN =====
 module.exports.run = async ({ api, event, args }) => {
-  if (args.length < 2) return api.sendMessage("Usage: !group add <tid> <number+unit> (e.g., 2year, 10day, 6month)", event.threadID);
+
+  // ===== REPLY REMOVE MODE =====
+  if (
+    event.messageReply &&
+    event.messageReply.body &&
+    event.messageReply.body.includes("𝐀𝐏𝐏𝐑𝐎𝐕𝐄𝐃 𝐆𝐑𝐎𝐔𝐏𝐒")
+  ) {
+    const index = parseInt(args[0]) - 1;
+
+    if (isNaN(index))
+      return api.sendMessage("❌ Only number allowed!", event.threadID);
+
+    if (!fs.existsSync(DATA_PATH))
+      return api.sendMessage("❌ No approved group found!", event.threadID);
+
+    let data = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
+
+    if (index < 0 || index >= data.length)
+      return api.sendMessage("❌ Invalid number!", event.threadID);
+
+    const removed = data.splice(index, 1)[0];
+    fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
+
+    return api.sendMessage(
+      `✅ Approved Group Removed\n\nTID : ${removed.t_id}`,
+      event.threadID
+    );
+  }
+
+  // ===== BOX MODE =====
+  if (args[0] === "box") {
+    if (!fs.existsSync(DATA_PATH))
+      return api.sendMessage("❌ No approved group found!", event.threadID);
+
+    const data = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
+    if (!data.length)
+      return api.sendMessage("❌ No approved group found!", event.threadID);
+
+    let msg = "";
+    msg += "╭─‣ 𝐀𝐏𝐏𝐑𝐎𝐕𝐄𝐃 𝐆𝐑𝐎𝐔𝐏𝐒\n";
+    msg += `├‣ 𝐓𝐎𝐓𝐀𝐋 : ${data.length}\n`;
+    msg += "├‣ 𝐫𝐗 × 𝐌𝐚𝐫𝐢𝐚 𝐯𝟑\n";
+    msg += "╰────────────◊\n";
+    msg += "  ─────×\n";
+
+    data.forEach((g, i) => {
+      const start = parseDate(g.time_start);
+      const end = parseDate(g.time_end);
+      const now = new Date();
+      const remain = Math.max(
+        0,
+        Math.ceil((end - now) / (1000 * 60 * 60 * 24))
+      );
+
+      msg += `╭─‣ ${i + 1}. 𝐓𝐈𝐃 : ${g.t_id}\n`;
+      msg += `├‣ type : ${g.user || "Everyone"}\n`;
+      msg += `├‣ start date : ${g.time_start}\n`;
+      msg += `├‣ end date : ${g.time_end}\n`;
+      msg += `├‣ remaining day : ${remain}\n`;
+      msg += "╰────────────◊\n";
+      msg += "  ─────×\n";
+    });
+
+    msg += "\n💡 Reply this message with number (1,2,3...) to remove";
+
+    return api.sendMessage(msg.trim(), event.threadID);
+  }
+
+  // ===== ADD MODE =====
+  if (args.length < 2)
+    return api.sendMessage(
+      "Usage:\n!approve <tid> <2day/2month/2year>\n!approve box",
+      event.threadID
+    );
 
   const tid = args[0];
-  const periodInput = args[1].toLowerCase();
+  const period = args[1].toLowerCase();
+  const match = period.match(/^(\d+)(day|month|year)$/);
 
-  // Match number + unit
-  const match = periodInput.match(/^(\d+)(day|month|year)$/);
-  if (!match) return api.sendMessage("Invalid format! Example: 2year, 10day, 6month", event.threadID);
+  if (!match)
+    return api.sendMessage(
+      "❌ Invalid format! Example: 2day / 3month / 1year",
+      event.threadID
+    );
 
-  const number = parseInt(match[1]);
+  const num = parseInt(match[1]);
   const unit = match[2];
 
-  let startDate = new Date();
-  let endDate = new Date();
+  const start = new Date();
+  const end = new Date();
 
-  switch (unit) {
-    case "day":
-      endDate.setDate(endDate.getDate() + number);
-      break;
-    case "month":
-      endDate.setMonth(endDate.getMonth() + number);
-      break;
-    case "year":
-      endDate.setFullYear(endDate.getFullYear() + number);
-      break;
-  }
-
-  const formatDate = (d) => `${String(d.getDate()).padStart(2,"0")}/${String(d.getMonth()+1).padStart(2,"0")}/${d.getFullYear()}`;
-
-  const newEntry = {
-    t_id: tid,
-    user: "everyone",
-    time_start: formatDate(startDate),
-    time_end: formatDate(endDate)
-  };
-
-  const filePath = path.join(__dirname, "data", "thuebot.json");
+  if (unit === "day") end.setDate(end.getDate() + num);
+  if (unit === "month") end.setMonth(end.getMonth() + num);
+  if (unit === "year") end.setFullYear(end.getFullYear() + num);
 
   let data = [];
-  try {
-    data = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  } catch (err) {
-    console.log("File not found or invalid JSON, creating new one.");
+  if (fs.existsSync(DATA_PATH)) {
+    data = JSON.parse(fs.readFileSync(DATA_PATH, "utf8"));
   }
 
-  // Avoid duplicates
-  if (data.find(e => e.t_id === tid)) {
-    return api.sendMessage(`❌ Group ${tid} already exists!`, event.threadID);
-  }
+  if (data.find((e) => e.t_id === tid))
+    return api.sendMessage("❌ This group already approved!", event.threadID);
 
-  data.push(newEntry);
+  data.push({
+    t_id: tid,
+    user: "Everyone",
+    time_start: formatDate(start),
+    time_end: formatDate(end),
+  });
 
-  // Save in single-line format
-  fs.writeFileSync(filePath, JSON.stringify(data), "utf-8");
+  fs.writeFileSync(DATA_PATH, JSON.stringify(data, null, 2));
 
-  api.sendMessage(`✅ Group ${tid} added! Period: ${number} ${unit}`, event.threadID);
+  api.sendMessage(
+    `✅ Group Approved!\n\nTID : ${tid}\nFrom : ${formatDate(
+      start
+    )}\nTo : ${formatDate(end)}`,
+    event.threadID
+  );
 };
