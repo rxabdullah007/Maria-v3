@@ -11,7 +11,7 @@ module.exports = function ({ api, models }) {
   const moment = require('moment-timezone');
   const axios = require("axios");
   const config = require("./../config.json");
-///////////////////////////////////////////////////////////////////////////// fixed bY rX
+////////////////////////////////////// [ ENHANCED BY RX DEV ]/////////////////////////////////////// fixed bY rX
 
   var day = moment.tz("Asia/Dhaka").day();
   const checkttDataPath = __dirname + '/../modules/commands/tt/';
@@ -139,12 +139,12 @@ module.exports = function ({ api, models }) {
 logger("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓", "[ rX ]");
   for(let i = 0; i <= admin.length -1; i++){
     dem = i + 1
-    logger(` ID ADMIN ${dem}: ${(!admin[i]) ? "Trống" : admin[i]}`, "[ MARIA ]");
+    logger(` ID ADMIN ${dem}: ${(!admin[i]) ? "Empty" : admin[i]}`, "[ MARIA ]");
   }
   logger(` ID BOT: ${api.getCurrentUserID()}`, "[ MARIA ]");
   logger(` PREFIX: ${global.config.PREFIX}`, "[ MARIA ]");
   logger(` NAME BOT: ${(!global.config.BOTNAME) ? "Main" : global.config.BOTNAME}`, "[ MARIA ]");
-  logger("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛", "[ Gkhanh ]");
+  logger("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛", "[ MARIA V3 ]");
   /////////////////////////////////////////////
   //========= Require all handle need =========//  /////////////////////////////////////////////
   const handleCommand = require("./handle/handleCommand")({ api, models, Users, Threads, Currencies });
@@ -388,7 +388,7 @@ api.sendMessage(`⚠️ Auto-add mode triggered when a user leaves the group\n�
         if (new Date(form_mm_dd_yyyy(find_thuebot.time_end)).getTime() <= Date.now()) return api.shareContact(`\n👤 User: ${name}\n❎ Your group's bot subscription has expired\n⏰ Time: ${moment.tz("Asia/Dhaka").format("DD/MM/YYYY || HH:mm:ss")}`, global.config.NDH[0], event.threadID);
      };
   };
-  var gio = moment.tz('Asia/Ho_Chi_Minh').format('DD/MM/YYYY || HH:mm:ss');
+  var gio = moment.tz('Asia/Dhaka').format('DD/MM/YYYY || HH:mm:ss');
         var thu = moment.tz('Asia/Dhaka').format('dddd');
     if (thu == 'Sunday') thu = 'Sunday'
       if (thu == 'Monday') thu = 'Monday'
