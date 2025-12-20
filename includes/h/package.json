@@ -1,7 +1,7 @@
 {
-  "name": "fca-maria",
+  "name": "fca-priyansh",
   "version": "20.0.0",
-  "description": "Facebook-chat-api made by rX",
+  "description": "dev priyansh | src from rX",
   "main": "index.js",
   "scripts": {
     "test": "mocha",
@@ -97,4 +97,5 @@
     "Priyansh Rajput"
   ]
 }
+
 
