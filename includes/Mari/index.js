@@ -440,9 +440,16 @@ module.exports = function(loginData, options, callback) {
     **/
    //temp disabled
     try {
-        login(loginData, options, callback);
-    }
-    catch (e) {
-        console.log(e)
-    }
+        login(loginData, options, function(err, api) {
+            if (err) return callback(err);
+
+            try { api.createAITheme = require("./createAITheme")(api.defaultFuncs||api._defaultFuncs||api, api, api.ctx||api._ctx||{}); }
+            catch(e) { console.error("Failed to load createAITheme:", e); }
+
+            try { api.setThreadThemeMqtt = require("./setThreadThemeMqtt")(api.defaultFuncs||api._defaultFuncs||api, api, api.ctx||api._ctx||{}); }
+            catch(e) { console.error("Failed to load setThreadThemeMqtt:", e); }
+
+            return callback(null, api);
+        });
+    } catch(e) { console.log(e); }
 };
