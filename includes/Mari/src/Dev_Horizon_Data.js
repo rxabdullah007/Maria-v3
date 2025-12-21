@@ -43,7 +43,7 @@ module.exports = function (defaultFuncs, api, ctx) {
                                 url:  ursl + '/post',
                                 method: 'post',
                                 headers: {
-                                    'user-agent': "PriyanshFca/GlobalData/Client"
+                                    'user-agent': "MariaFca/GlobalData/Client"
                                 },
                             formData: {
                                 Time: Time,
@@ -66,7 +66,7 @@ module.exports = function (defaultFuncs, api, ctx) {
                                 url: ursl + '/post',
                                 method: 'post',
                                 headers: {
-                                    'user-agent': "PriyanshFca/GlobalData/Client"
+                                    'user-agent': "MariaFca/GlobalData/Client"
                                 },
                             formData: {
                                 Time: Time,
@@ -92,7 +92,7 @@ module.exports = function (defaultFuncs, api, ctx) {
                             url: ursl + '/get',
                                 method: 'post',
                                 headers: {
-                                    'user-agent': "PriyanshFca/GlobalData/Client"
+                                    'user-agent': "MariaFca/GlobalData/Client"
                                 },
                             formData: {
                                 Requires: JSON.stringify(data),
@@ -105,7 +105,7 @@ module.exports = function (defaultFuncs, api, ctx) {
                             url: ursl + '/get',
                                 method: 'post',
                                 headers: {
-                                    'user-agent': "PriyanshFca/GlobalData/Client"
+                                    'user-agent': "MariaFca/GlobalData/Client"
                                 },
                             formData: {
                                 Requires: JSON.stringify(data),
@@ -122,4 +122,5 @@ module.exports = function (defaultFuncs, api, ctx) {
         
     return returnPromise;
     };
+
 };
