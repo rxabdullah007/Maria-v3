@@ -42,24 +42,25 @@ module.exports = function ({ api, models, Users, Threads, Currencies }) {
     const escapeRegex = (str) => str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const prefixRegex = new RegExp(`^(<@!?${senderID}>|${escapeRegex(threadPrefix)})\\s*`);
 
-    const CUSTOM_UIDS = ["100068565380737", "61579782879961"]; // Custom UID list
-
     // ===== OnlyPrefix / No-Prefix system =====
     let args = [];
     let commandName = "";
 
     const prefixUsed = body.startsWith(threadPrefix);
-    if (CUSTOM_UIDS.includes(senderID) && !prefixUsed) {
-      const temp = body.trim().split(/ +/);
-      commandName = temp.shift()?.toLowerCase();
-      args = temp;
-    } else {
-      if (!prefixRegex.test(body)) return; // reject no-prefix for others
-      const [matchedPrefix] = body.match(prefixRegex);
-      const argsTemp = body.slice(matchedPrefix.length).trim().split(/ +/);
-      commandName = argsTemp.shift()?.toLowerCase();
-      args = argsTemp;
-    }
+
+   // 🔥 Only BOT ADMIN can use no-prefix
+ if (ADMINBOT.includes(senderID) && !prefixUsed) {
+    const temp = body.trim().split(/ +/);
+    commandName = temp.shift()?.toLowerCase();
+    args = temp;
+  } else {
+    // everyone else MUST use prefix
+    if (!prefixRegex.test(body)) return;
+    const [matchedPrefix] = body.match(prefixRegex);
+    const argsTemp = body.slice(matchedPrefix.length).trim().split(/ +/);
+    commandName = argsTemp.shift()?.toLowerCase();
+    args = argsTemp;
+  }
 
     // Only prefix call
     if (!commandName) {
